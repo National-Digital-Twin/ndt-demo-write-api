@@ -14,7 +14,7 @@ import uuid
 import pygeohash as pgh
 from access import AccessClient
 import configparser
-from maplib.access import SecurityLabelBuilder, EDHSecurityLabelsV2
+from telicent_labels import SecurityLabelBuilder, TelicentSecurityLabelsV2
 from utils import get_headers as get_forwarding_headers
 
 from rdflib import Graph, plugin, URIRef, BNode, Literal
@@ -35,11 +35,11 @@ class EDH(BaseModel):
     def to_string(self):
         builder = SecurityLabelBuilder()
         if len(self.permitted_organisations) > 0:
-            builder.add_multiple(EDHSecurityLabelsV2.PERMITTED_ORGANISATIONS.value, *self.permitted_organisations)
+            builder.add_multiple(TelicentSecurityLabelsV2.PERMITTED_ORGANISATIONS.value, *self.permitted_organisations)
         if len(self.permitted_nationalities) > 0:
-            builder.add_multiple(EDHSecurityLabelsV2.PERMITTED_NATIONALITIES.value, *self.permitted_nationalities)
+            builder.add_multiple(TelicentSecurityLabelsV2.PERMITTED_NATIONALITIES.value, *self.permitted_nationalities)
         if self.classification:
-            builder.add(EDHSecurityLabelsV2.CLASSIFICATION.value, self.classification.value)
+            builder.add(TelicentSecurityLabelsV2.CLASSIFICATION.value, self.classification.value)
         return builder.build()
 
 #If you're running this yourself, and the Jena instance you're using is not local, you can used environment variables to override
@@ -50,7 +50,7 @@ ontoDataset = os.getenv("ONTO_DATASET", "ontology")
 dataset = os.getenv("KNOWLEDGE_DATASET", "knowledge")
 default_security_label = EDH(classification=ClassificationEmum.official) 
 data_uri_stub = os.getenv("DATA_URI",'http://nationaldigitaltwin.gov.uk/data#') #This can be overridden in use
-update_mode = os.getenv("UPDATE_MODE","KAFKA")
+update_mode = os.getenv("UPDATE_MODE","SCG")
 access_protocol = os.getenv("ACCESS_PROTOCOL", "http")
 access_host = os.getenv("ACCESS_URL", "localhost")
 access_port = os.getenv("ACCESS_PORT", "8091")
@@ -62,8 +62,8 @@ fpTopic = os.getenv("IES_TOPIC","knowledge")
 
 
 if update_mode == "KAFKA":
-    from maplib.sinks import KafkaSink
-    from maplib import Adapter, Record,RecordUtils
+    from telicent_lib.sinks import KafkaSink
+    from telicent_lib import Adapter, Record,RecordUtils
 
     knowledgeSink = KafkaSink(topic=fpTopic, broker=broker)
     knowledgeAdapter = Adapter(knowledgeSink, name="IoW Write-Back API",source_name="local data")
