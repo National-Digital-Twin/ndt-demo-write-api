@@ -55,6 +55,7 @@ access_protocol = os.getenv("ACCESS_PROTOCOL", "http")
 access_host = os.getenv("ACCESS_URL", "localhost")
 access_port = os.getenv("ACCESS_PORT", "8091")
 dev_mode = os.getenv("DEV", "False")
+access_path=os.getenv("ACCESS_PATH", "/")
 port = os.getenv("PORT", "5021")
 
 broker = os.getenv("BOOTSTRAP_SERVERS","localhost:9092")
@@ -81,7 +82,7 @@ else:
 ies = "http://ies.data.gov.uk/ontology/ies4#"
 ndt_ont="http://nationaldigitaltwin.gov.uk/ontology#"
 
-access_url = f"{access_protocol}://{access_host}:{access_port}"
+access_url = f"{access_protocol}://{access_host}:{access_port}{access_path}"
 jena_url = f"{jenaProtocol}://{jenaURL}:{jenaPort}"
 def add_prefix(prefix,uri):
     prefix_dict[prefix] = uri
